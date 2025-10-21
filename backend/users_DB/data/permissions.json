@@ -1,0 +1,19 @@
+[
+    {
+      "id": "64a1234567abcdef12345678",
+      "permissions": [
+        "View Subscriptions",
+        "Create Subscriptions",
+        "Delete Subscriptions",
+        "View Courses",
+        "admin"
+      ]
+    },
+    {
+      "id": "64a1234567abcdef12345679",
+      "permissions": [
+        "View Subscriptions"
+      ]
+    }
+  ]
+  

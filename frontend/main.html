@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div id="navbar-container"></div>
+  <script src="navbarAndName.js"></script>
+
+  <script>
+    const username = sessionStorage.getItem("username");
+    const token = sessionStorage.getItem("token");
+
+    async function getUserData() {
+      try {
+        const resp = await fetch(`http://127.0.0.1:8000/users/username/${username}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const data = await resp.json();
+
+        if (data.permissions) {
+          sessionStorage.setItem("permissions", JSON.stringify(data.permissions))
+
+          sessionStorage.setItem("userId", data._id)
+
+          sessionStorage.setItem("name", `${data.firstName} ${data.lastName}`)
+        }
+        if (data.permissions.includes("admin")) {
+          sessionStorage.setItem("admin", "true")
+
+        } else {
+          sessionStorage.setItem("admin", "false")
+        }
+
+
+        if (sessionStorage.getItem("admin")) {
+          window.location.href = "courses.html"
+        } else {
+          window.location.href = "main.html"
+        }
+
+
+      } catch (err) {
+        console.error("Problem with user data request:", err);
+      }
+    }
+
+    if (!sessionStorage.getItem("admin")) {
+      getUserData();
+    }
+
+  </script>
+
+  <script src="auth.js"></script>
+
+</body>
+
+</html>

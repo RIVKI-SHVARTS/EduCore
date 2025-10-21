@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>allEnrolled</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="navbar-container"></div>
+  <script src="navbarAndName.js"></script>
+
+  <script src="alerts.js"></script>
+
+  <h1>Enrollments</h1>
+
+  <nav id="nav2">
+    <a href="allEnrolled.html" class="active">All Enrolled</a>
+  </nav>
+
+  <div id="container"></div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8800";
+    const token = sessionStorage.getItem("token") || "";
+    const permissionsRaw = sessionStorage.getItem("permissions") || "";
+
+    const hasPermission = (perm) => {
+      try {
+        const arr = JSON.parse(permissionsRaw);
+        if (Array.isArray(arr)) return arr.includes(perm);
+      } catch { }
+      return typeof permissionsRaw === "string" ? permissionsRaw.includes(perm) : false;
+    };
+
+    const nav2 = document.getElementById("nav2");
+    if (hasPermission("Create Enrollments")) {
+      const link = document.createElement("a");
+      link.href = "addEnrolled.html";
+      link.textContent = "Add Enrolled";
+      nav2.appendChild(link);
+    }
+
+    function getCurrentDate() {
+      const today = new Date();
+      return today.toISOString();
+    }
+
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      return isNaN(d) ? "" : d.toLocaleDateString();
+    }
+
+    async function fetchData(endpoint) {
+      const resp = await fetch(`${API_BASE}/${endpoint}`, {
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+      });
+      if (!resp.ok) throw new Error(`Failed to fetch ${endpoint}`);
+      return resp.json();
+    }
+
+    let allEnrollments = [];
+    let allCourses = [];
+    let allStudents = [];
+    const aggregated = [];
+    const registrationDate = getCurrentDate()
+    const showAddCourseFor = new Set();
+
+    const buildAggregatedData = async () => {
+      allEnrollments = await fetchData("enrollments");
+      allCourses = await fetchData("courses");
+      allStudents = await fetchData("students");
+
+      aggregated.length = 0;
+
+      allEnrollments.forEach(enrollment => {
+        const studentObj = allStudents.find(s => String(s._id) === String(enrollment.studentId));
+        if (!studentObj) return;
+
+        const coursesForStudent = enrollment.courses
+          .map(ec => {
+            const courseObj = allCourses.find(c => String(c._id) === String(ec.courseId));
+            if (!courseObj) return null;
+            return { ...courseObj, startDate: ec.startDate };
+          })
+          .filter(Boolean);
+
+        aggregated.push({ ...studentObj, courses: coursesForStudent });
+      });
+    };
+
+    const displayData = async (studentName) => {
+      await buildAggregatedData();
+
+      let arrayToUse = aggregated;
+      if (studentName) {
+        arrayToUse = aggregated.filter(st => st.name.trim().toLowerCase() === studentName.trim().toLowerCase());
+      }
+
+      const container = document.getElementById("container");
+      container.innerHTML = "";
+
+      arrayToUse.forEach(student => {
+        const div = document.createElement("div");
+        div.classList.add("user-card");
+
+        const registeredCourseListHTML = student.courses.map(course => {
+          const dateStr = formatDate(course.startDate);
+          if (hasPermission("View Courses")) {
+            return `<li><a href="allCourses.html?courseId=${course._id}">${course.name}</a> - ${dateStr}</li>`;
+          } else {
+            return `<li><a href="#" onclick="alert('You do not have permission to view courses.'); return false;">${course.name}</a> - ${dateStr}</li>`;
+          }
+        }).join("");
+
+        const courseList = allCourses.filter(c => !student.courses.find(rc => String(rc._id) === String(c._id)));
+
+        const unregisteredCourseDivs = courseList.map(course => `
+          <div class="course-option" data-date="${course.startDate || ""}" onmouseover="handleHover(this)">
+            ${course.name}
+            <button class="register-btn" onclick="registerBut('${course._id}', '${student._id}', '${course.startDate || ""}', '${registrationDate}')">Register</button>
+          </div>
+        `).join("");
+
+        const uniqueId = `hover-date-${student._id}`;
+        const toggleButtonText = showAddCourseFor.has(student._id) ? "Close" : "Enroll to new course";
+
+        div.innerHTML = `
+          <h2 class="username">${student.name}</h2>
+          <p><span class="label">Email:</span><span class="value">${student.email}</span></p>
+          <p><span class="label">City:</span><span class="value">${student.city}</span></p>
+
+          ${hasPermission("Update Enrollments") ? `<button onclick="editStudent('${student._id}')">Edit</button>` : ""}
+          ${hasPermission("Update Enrollments") ? `<button onclick="deleteStudent('${student._id}')">Delete</button>` : ""}
+
+          <div class="add-course-container">
+            <h4>Registered Courses:</h4>
+            <ul>${registeredCourseListHTML}</ul>
+
+            ${hasPermission("Update Enrollments") ? `<button onclick="toggleAddCourse('${student._id}')" id="toggle-button-${student._id}">${toggleButtonText}</button>` : ""}
+            <div id="add-course-container-${student._id}" class="add-course-container" style="display: ${showAddCourseFor.has(student._id) ? "block" : "none"};">
+              <h3>Add a new course:</h3>
+              <p><span id="${uniqueId}"></span></p>
+              <div>${unregisteredCourseDivs}</div>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    };
+
+    function toggleAddCourse(studentId) {
+      const button = document.getElementById(`toggle-button-${studentId}`);
+      if (showAddCourseFor.has(studentId)) {
+        showAddCourseFor.delete(studentId);
+        if (button) button.textContent = "Enroll to new course";
+      } else {
+        showAddCourseFor.add(studentId);
+        if (button) button.textContent = "Close";
+      }
+      displayData();
+    }
+
+    function handleHover(element) {
+      const startDate = element.dataset.date;
+      const studentContainer = element.closest(".user-card");
+      const hoverDateSpan = studentContainer.querySelector("span[id^='hover-date']");
+      if (hoverDateSpan) hoverDateSpan.textContent = startDate ? `Start Date: ${formatDate(startDate)}` : "";
+    }
+
+    async function registerBut(courseId, studentId, startDate, registrationDate) {
+      const enrollment = allEnrollments.find(e => String(e.studentId) === String(studentId));
+      if (!enrollment) return alert("Enrollment not found for this student.");
+
+      const newCourse = { courseId, startDate, registrationDate };
+      const updatedCourses = [...enrollment.courses, newCourse];
+      const updatedEnrollment = { ...enrollment, courses: updatedCourses };
+
+      const resp = await fetch(`${API_BASE}/enrollments/${enrollment._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(updatedEnrollment)
+      });
+      if (!resp.ok) { alert("Failed to register to course"); return; }
+
+      toggleAddCourse(studentId);
+      displayData();
+    }
+
+    function editStudent(studentId) {
+      window.location.href = `editStudent.html?id=${studentId}`;
+    }
+
+    async function deleteStudent(studentId) {
+      const enrollment = allEnrollments.find(e => String(e.studentId) === String(studentId));
+      if (!enrollment) return showAlert("Enrollment not found.", "error");
+
+      showAlert(
+        "Are you sure you want to delete this enrollment?",
+        "confirm",
+        0,
+        async () => {
+          await fetch(`${API_BASE}/enrollments/${enrollment._id}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          toggleAddCourse(studentId);
+          displayData();
+          showAlert("Enrollment deleted successfully!", "success");
+        },
+        () => {
+          showAlert("Deletion cancelled.", "info");
+        }
+      );
+    }
+
+    (async () => {
+      await displayData();
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name");
+      if (name) displayData(name);
+    })();
+  </script>
+
+  <script src="auth.js"></script>
+</body>
+
+</html>

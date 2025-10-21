@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <script src="alerts.js"></script>
+
+    <div class="form-card">
+
+        <h1>login:</h1>
+        <label for="username:">USERNAME:</label>
+        <input type="text" id="username" placeholder="anter username">
+
+        <br>
+
+        <label for="password:">PASSWORD:</label>
+        <input type="password" id="password" placeholder="anter password">
+
+        <br>
+        <button onclick="checkAuthentication()">login</button>
+        <br>
+        <p>New User? <a href="CreateAccount.html">Cretae Account</a></p>
+
+    </div>
+
+
+
+    <script>
+
+        const getUsername = () => {
+            const username = document.getElementById("username").value
+            return username
+        }
+
+        const getPassword = () => {
+            const password = document.getElementById("password").value
+            return password
+        }
+
+        const checkAuthentication = async () => {
+            const username = getUsername().trim()
+            const password = getPassword().trim()
+
+
+            if (!username || !password) {
+                showAlert("Please anter both username and password.", "error")
+                return
+            }
+
+            try {
+                const resp = await fetch("http://127.0.0.1:8000/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username, password }),
+                })
+
+                let data;
+                try {
+                    data = await resp.json();
+                } catch {
+                    showAlert("Unexpected server response.", "error");
+                    return;
+                }
+
+                console.log("result:", data)
+
+
+                if (!data.token) {
+                    showAlert("Login failed. Please check your credentials.", "error")
+                    return
+                }
+
+                sessionStorage.setItem("username", username)
+                sessionStorage.setItem("token", data.token)
+
+                window.location.href = "main.html";
+
+            } catch (err) {
+                console.error("Problem with login request:", err)
+                showAlert("Server error during login.", "error")
+            }
+        }
+
+    </script>
+
+
+</body>
+
+</html>

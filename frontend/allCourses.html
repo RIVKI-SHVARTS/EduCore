@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Courses</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+    <script src="navbarAndName.js"></script>
+
+    <script src="alerts.js"></script>
+
+    <h1>COURSES</h1>
+
+    <nav id="nav"></nav>
+
+    <br />
+
+    <label for="inputSearch">Find Course</label>
+    <input id="inputSearch" type="text" />
+
+    <button onclick="find()">Find</button>
+
+    <br /><br />
+    <div id="divConteyner"></div>
+
+    <script>
+        const token = sessionStorage.getItem("token");
+        const permissionsString = sessionStorage.getItem("permissions");
+        const permissions = JSON.parse(permissionsString || "[]");
+
+        const navbar = document.getElementById("nav");
+
+        const link1 = document.createElement("a");
+        link1.href = "allCourses.html";
+        link1.className = "active";
+        link1.textContent = "All Courses";
+        navbar.appendChild(link1);
+
+        if (permissions.includes("Create Courses")) {
+            const link2 = document.createElement("a");
+            link2.href = "addCourse.html";
+            link2.textContent = "Add Course";
+            navbar.appendChild(link2);
+        }
+
+        let allCoursesCache = [];
+        let allEnrollmentsCache = [];
+        let allMembersCache = [];
+        let allUsersFromJson = []
+
+        async function loadUsers() {
+            try {
+                const resp = await fetch('../backend/new_users_folder/data/users.json');
+                if (!resp.ok) throw new Error("Failed to fetch users JSON");
+                const data = await resp.json();
+                console.log(data);
+                return data
+            } catch (err) {
+                console.error(err);
+                return [];
+            }
+        }
+
+      
+        async function getAllCourses() {
+            try {
+                const resp = await fetch("http://127.0.0.1:8800/courses/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return await resp.json();
+            } catch (err) {
+                console.error("Error fetching courses:", err);
+                return [];
+            }
+        }
+
+        async function getAllEnrollments() {
+            try {
+                const resp = await fetch("http://127.0.0.1:8800/enrollments", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return await resp.json();
+            } catch (err) {
+                console.error("Error fetching enrollments:", err);
+                return [];
+            }
+        }
+
+        async function getAllMembers() {
+            try {
+                const resp = await fetch("http://127.0.0.1:8800/students", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return await resp.json();
+            } catch (err) {
+                console.error("Error fetching members:", err);
+                return [];
+            }
+        }
+
+        const setAllCourses = async (coursesToShow = null) => {
+            const divConteyner = document.getElementById("divConteyner");
+            divConteyner.innerHTML = "";
+
+            const courses = coursesToShow || allCoursesCache;
+
+            const allEnrollments = allEnrollmentsCache;
+            const allMembers = allMembersCache;
+
+            const membersMap = {};
+            allMembers.forEach((member) => {
+                membersMap[member._id] = member.name;
+            });
+
+            courses.forEach((course) => {
+                const div = document.createElement("div");
+                div.classList.add("course-card");
+
+                div.innerHTML = `
+                    <strong>${course.category}</strong><br>
+                    ${course.name}<br>
+                    Starts at: ${new Date(course.startDate).toLocaleDateString()}<br><br>
+                    <img src="${course.image}" alt="${course.name}"><br><br>
+                `;
+
+                const regDiv = document.createElement("div");
+                const relevantEnrollments = [];
+                allEnrollments.forEach((enroll) => {
+                    enroll.courses.forEach((c) => {
+                        if (c.courseId === course._id) {
+                            const memberName = membersMap[enroll.studentId] || "Unknown";
+                            relevantEnrollments.push({
+                                studentId: enroll.studentId,
+                                memberName,
+                                date: c.registrationDate ? new Date(c.registrationDate).toLocaleDateString() : "",
+
+                            });
+                        }
+                    });
+                });
+
+                if (relevantEnrollments.length > 0) {
+                    const ul = document.createElement("ul");
+                    regDiv.innerHTML = `<strong>Student Enrollments:</strong>`;
+                    relevantEnrollments.forEach((enroll) => {
+
+                        const li = document.createElement("li");
+
+                        if (permissions.includes("View Enrollments")) {
+                            li.innerHTML = `<a href="allEnrolled.html?name=${enroll.memberName}">${enroll.memberName}</a> (${enroll.date})`;
+                        } else {
+                            const link = document.createElement("a");
+
+                            link.href = "#";
+                            link.textContent = enroll.memberName;
+
+                            link.addEventListener("click", (e) => {
+                                e.preventDefault();
+                                showAlert("You do not have permission to view enrollments.", "info", 2000);
+                            });
+
+                            li.appendChild(link);
+
+                            li.appendChild(document.createTextNode(` (${enroll.date})`));
+                        }
+
+                        ul.appendChild(li);
+                    });
+
+                    regDiv.appendChild(ul);
+                } else {
+                    regDiv.innerHTML = "<em>No enrollments</em>";
+                }
+
+                let editBtn;
+                if (permissions.includes("Update Courses")) {
+                    editBtn = document.createElement("button");
+                    editBtn.textContent = "Edit";
+                    editBtn.classList.add("btn", "edit-btn");
+                    editBtn.onclick = () => {
+                        window.location.href = `editCourse.html?id=${course._id}`;
+                    }
+                }
+
+                let deleteBtn;
+                if (permissions.includes("Delete Courses")) {
+                    deleteBtn = document.createElement("button");
+                    deleteBtn.textContent = "Delete";
+                    deleteBtn.classList.add("btn", "delete-btn");
+
+                    deleteBtn.onclick = async () => {
+                        showAlert(
+                            "Are you sure you want to delete this course?",
+                            "confirm",
+                            0,
+                            async () => {
+                                await fetch(`http://127.0.0.1:8800/courses/${course._id}`, {
+                                    method: "DELETE",
+                                    headers: {
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                });
+                                await loadData();
+                                setAllCourses();
+                                showAlert("Course deleted successfully!", "success");
+                            },
+                            () => {
+                                showAlert("Deletion cancelled", "info");
+                            }
+                        );
+                    };
+
+                }
+
+                div.appendChild(regDiv);
+                if (editBtn) {
+                    div.appendChild(editBtn);
+                }
+                if (deleteBtn) {
+                    div.appendChild(deleteBtn);
+                }
+                divConteyner.appendChild(div);
+            });
+        };
+
+        const loadData = async () => {
+            allCoursesCache = await getAllCourses();
+            allEnrollmentsCache = await getAllEnrollments();
+            allMembersCache = await getAllMembers();
+            allUsersFromJson = await loadUsers();
+        };
+
+        const find = () => {
+            const inputValue = document.getElementById("inputSearch").value.toLowerCase().trim();
+
+            if (!inputValue) {
+                setAllCourses();
+                return;
+            }
+
+            const filteredCourses = allCoursesCache.filter(
+                (course) =>
+                    course.name.toLowerCase().startsWith(inputValue) ||
+                    course.category.toLowerCase().startsWith(inputValue)
+            );
+
+            setAllCourses(filteredCourses);
+        };
+
+        (async () => {
+            await loadData();
+            setAllCourses();
+        })();
+
+        (async () => {
+            await loadData();
+            const params = new URLSearchParams(window.location.search);
+            const courseId = params.get("courseId");
+            if (courseId) {
+                const filteredCourse = allCoursesCache.find(course => course._id === courseId);
+                setAllCourses(filteredCourse ? [filteredCourse] : []);
+            } else {
+                setAllCourses();
+            }
+        })();
+
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

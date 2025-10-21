@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add User</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+
+    <div id="navbar-container"></div>
+    <script src="navbarAndName.js"></script>
+
+
+    <script src="alerts.js"></script>
+
+    <h1>Add User</h1>
+
+    <nav>
+        <a href="users.html">All Users</a>
+        <a href="addUser.html" class="active">Add User</a>
+    </nav>
+
+
+    <div id="divContainer"></div>
+
+    <script>
+        const token = sessionStorage.getItem("token");
+        let newUser = { permissions: [] };
+        const container = document.getElementById("divContainer");
+
+        container.innerHTML = `
+<div class="form-card">
+  <label>First name:</label>
+  <input type="text" onchange="handleInputChange(this, 'firstName')">
+  
+  <label>Last name:</label>
+  <input type="text" onchange="handleInputChange(this, 'lastName')">
+  
+  <label>Username:</label>
+  <input type="text" onchange="handleInputChange(this, 'username')">
+  
+  <label>Session timeout:</label>
+  <input type="number" onchange="handleInputChange(this, 'sessionTimeOut')">
+  <br><br>
+  <label>Permissions:</label><br>
+  <div id="permissionsContainer"></div>
+  
+  <div class="button-group">
+    <button type="button" onclick="Save()">Save</button>
+    <button type="button" onclick="cancel()">Cancel</button>
+  </div>
+</div>
+`;
+
+
+        const allPermissions = [
+            "View Enrollments",
+            "Create Enrollments",
+            "Delete Enrollments",
+            "Update Enrollments",
+            "View Courses",
+            "Create Courses",
+            "Delete Courses",
+            "Update Courses"
+        ];
+
+        const permissionsContainer = document.getElementById("permissionsContainer");
+
+        allPermissions.forEach((perm, index) => {
+            const checkboxId = `perm_${index}`;
+            const div = document.createElement("div");
+            div.innerHTML = `
+        <input type="checkbox" id="${checkboxId}" value="${perm}" onchange="handlePermissionChange(this, this.value)">
+        <label for="${checkboxId}">${perm}</label>
+      `;
+            permissionsContainer.appendChild(div);
+        });
+
+        const handleInputChange = (element, key) => {
+            const newValue = element.value;
+            newUser = { ...newUser, [key]: newValue };
+            console.log("Updated user data:", newUser);
+        };
+
+        const handlePermissionChange = (element, key) => {
+            const isChecked = element.checked;
+            const permissionsArr = newUser.permissions;
+
+            if (isChecked) {
+                if (
+                    ["Create Enrollments", "Delete Enrollments", "Update Enrollments"].includes(key) &&
+                    !permissionsArr.includes("View Enrollments")
+                ) {
+                    permissionsArr.push("View Enrollments");
+                    document.querySelector('input[value="View Enrollments"]').checked = true;
+                }
+
+                if (
+                    ["Create Courses", "Delete Courses", "Update Courses"].includes(key) &&
+                    !permissionsArr.includes("View Courses")
+                ) {
+                    permissionsArr.push("View Courses");
+                    document.querySelector('input[value="View Courses"]').checked = true;
+                }
+
+                if (!permissionsArr.includes(key)) {
+                    permissionsArr.push(key);
+                }
+            } else {
+       
+                newUser.permissions = permissionsArr.filter(p => p !== key);
+
+                if (
+                    ["Create Enrollments", "Delete Enrollments", "Update Enrollments"].includes(key) &&
+                    !newUser.permissions.some(p =>
+                        ["Create Enrollments", "Delete Enrollments", "Update Enrollments"].includes(p)
+                    )
+                ) {
+                    newUser.permissions = newUser.permissions.filter(p => p !== "View Enrollments");
+                    document.querySelector('input[value="View Enrollments"]').checked = false;
+                }
+
+                if (
+                    ["Create Courses", "Delete Courses", "Update Courses"].includes(key) &&
+                    !newUser.permissions.some(p =>
+                        ["Create Courses", "Delete Courses", "Update Courses"].includes(p)
+                    )
+                ) {
+                    newUser.permissions = newUser.permissions.filter(p => p !== "View Courses");
+                    document.querySelector('input[value="View Courses"]').checked = false;
+                }
+            }
+
+        };
+
+        const cancel = () => {
+            window.location.href = "manageUsers.html";
+        }
+
+        const Save = async () => {
+
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            // newUser = { ...newUser, ["createdDate"]: formattedDate }
+
+            const resp = await fetch(`http://127.0.0.1:8000/users`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(newUser),
+            })
+
+            const data = await resp.json()
+            showAlert("user added successfully!", "success");
+
+            setTimeout(() => {
+                window.location.href = "manageUsers.html";
+            }, 3000);
+        }
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html> 
+
+
+
+
+
+
+
+
+
+
+

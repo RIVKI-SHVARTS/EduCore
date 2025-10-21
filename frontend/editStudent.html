@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Student</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="navbar-container"></div>
+  <script src="navbarAndName.js"></script>
+  <script src="alerts.js"></script>
+
+  <h1>Edit Student</h1><br>
+  <div id="divContainer"></div>
+
+  <script>
+    const token = sessionStorage.getItem("token");
+    let student;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get("id");
+
+
+    const getStudent = async () => {
+      try {
+        const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!resp.ok) {
+          throw new Error(`Server error: ${resp.status}`);
+        }
+
+        const data = await resp.json();
+
+        if (!data || Object.keys(data).length === 0) {
+          showAlert("Student not found.", "error");
+          return null;
+        }
+
+        return data;
+
+      } catch (err) {
+        console.error("Error fetching student:", err);
+        showAlert("An error occurred while loading student data.", "error");
+        return null;
+      }
+    };
+
+
+    const renderEditForm = async () => {
+      student = await getStudent();
+      if (!student) return;
+
+      const divContainer = document.getElementById("divContainer");
+      divContainer.innerHTML = `
+        <div class="form-card">
+          <label for="name">Name:</label>
+          <input type="text" id="name" value="${student.name}" onchange="handleChanges(this,'name')"> <br><br>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" value="${student.email}" onchange="handleChanges(this,'email')"> <br><br>
+
+          <label for="city">City:</label>
+          <input type="text" id="city" value="${student.city}" onchange="handleChanges(this,'city')"><br><br>
+
+          <div class="button-group">
+            <button onclick="updateStudent()">Update</button>
+            <button onclick="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      `;
+    };
+
+
+    const handleChanges = (element, key) => {
+      const newData = element.value;
+      student = { ...student, [key]: newData };
+    };
+
+
+    const updateStudent = async () => {
+      try {
+        const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(student),
+        });
+
+        if (!resp.ok) {
+          throw new Error(`Error updating student: ${resp.status}`);
+        }
+
+        const result = await resp.json();
+        console.log("Updated student:", result);
+
+        showAlert("Student updated successfully!", "success");
+
+        setTimeout(() => {
+          window.location.href = "allEnrolled.html";
+        }, 2500);
+
+      } catch (err) {
+        console.error("Error updating student:", err);
+        showAlert("Failed to update student. Please try again.", "error");
+      }
+    };
+
+
+    const cancelEdit = () => {
+      window.history.back();
+    };
+
+
+    renderEditForm();
+  </script>
+
+  <script src="auth.js"></script>
+</body>
+
+</html>

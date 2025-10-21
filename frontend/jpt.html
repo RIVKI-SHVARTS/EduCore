@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <script src="alerts.js"></script>
+
+    <script>
+        const permissionsString = sessionStorage.getItem("permissions");
+
+        if (permissionsString) {
+            let permissions = [];
+            try {
+                permissions = JSON.parse(permissionsString); // ✅ השינוי – עטפתי ב־try/catch
+            } catch (err) {
+                console.error("Failed to parse permissions", err);
+                showAlert("Invalid permissions data.", "error");
+                setTimeout(() => {
+                    window.history.back();
+                }, 2000);
+                // מפסיקים פה כדי שלא ירוץ שאר הקוד
+                // return;
+            }
+
+            if (permissions.includes("View Courses")) {
+                window.location.href = "allCourses.html";
+            } else {
+                showAlert("You don't have permission to view the courses.", "error");
+                setTimeout(() => {
+                    window.history.back();
+                }, 2000);
+            }
+        } else {
+            showAlert("No permissions found.", "error");
+            setTimeout(() => {
+                window.history.back();
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>

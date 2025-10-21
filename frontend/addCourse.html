@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Course</title>
+    <link rel="stylesheet" href="style.css">
+
+    <meta name="description" content="Add a new course to the course management system.">
+</head>
+
+<body>
+
+
+    <div id="navbar-container"></div>
+    <script src="navbarAndName.js"></script>
+
+    <script src="alerts.js"></script>
+
+    <h1>Add Course</h1>
+
+
+
+    <nav>
+        <a href="allCourses.html">All Courses</a>
+        <a href="addCourse.html" class="active">Add Course</a>
+    </nav>
+
+    <br>
+
+    <div class="form-card">
+
+        <label for="name">Name:</label>
+        <input type="text" id="name"> <br><br>
+
+        <label for="category">Category:</label>
+        <input type="text" id="category"> <br><br>
+
+        <label for="image">Image URL:</label>
+        <input type="url" id="image"> <br><br>
+
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate"> <br><br>
+
+        <div class="button-group">
+            <button onclick="save()">Save</button>
+            <button onclick="cancel()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const token = sessionStorage.getItem("token");
+
+
+        async function getNewCourseData() {
+            const name = document.getElementById("name").value.trim();
+            const category = document.getElementById("category").value.trim();
+            const image = document.getElementById("image").value.trim();
+            const startDate = document.getElementById("startDate").value.trim();
+            const registrationDate = await getCurrentDate()
+
+            if (!name || !category || !image || !startDate) {
+                showAlert("All fields are required!", "error");
+                return null;
+            }
+
+            try {
+                new URL(image);
+            } catch {
+                showAlert("Please enter a valid image URL.", "warning");
+                return null;
+            }
+
+            return { name, category, image, startDate };
+        }
+
+        async function save() {
+            const newCourse = getNewCourseData();
+            if (!newCourse) return;
+
+            try {
+                const response = await fetch("http://127.0.0.1:8800/courses", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newCourse)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert("Course added successfully!", "success");
+
+                    setTimeout(() => {
+                        window.location.href = "allCourses.html";
+                    }, 2500);
+
+                } else {
+                    showAlert("Error: " + (data.msg || response.statusText), "error");
+                }
+            } catch (err) {
+                showAlert("Request failed: " + err.message, "error");
+
+            }
+        }
+
+        function cancel() {
+            window.location.href = "allCourses.html";
+        }
+    </script>
+    <script src="auth.js"></script>
+
+</body>
+
+</html>

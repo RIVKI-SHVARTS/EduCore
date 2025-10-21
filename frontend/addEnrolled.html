@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Enrollment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+    <script src="navbarAndName.js"></script>
+    <script src="alerts.js"></script>
+
+    <h1>Enrollments</h1>
+
+    <nav>
+        <a href="allEnrolled.html">All Enrolled</a>
+        <a href="addEnrolled.html" class="active">Add Enrolled</a>
+    </nav>
+
+    <div class="form-card">
+        <label for="name">Name:</label>
+        <input type="text" id="name"> <br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email"> <br><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city"> <br><br>
+
+        <div class="button-group">
+            <button onclick="save()">Save</button>
+            <button onclick="cancel()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const token = sessionStorage.getItem("token");
+
+        function getNewEnrolledData() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const city = document.getElementById("city").value.trim();
+
+            let missingFields = [];
+            if (!name) missingFields.push("Name");
+            if (!email) missingFields.push("Email");
+            if (!city) missingFields.push("City");
+
+            if (missingFields.length) {
+                showAlert("Missing fields: " + missingFields.join(", "), "error");
+                return null;
+            }
+
+            return { name, email, city };
+        }
+
+        async function getStudent() {
+            const newEnrollment = getNewEnrolledData();
+            if (!newEnrollment) return null;
+
+            try {
+                const response = await fetch("http://127.0.0.1:8800/students", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+
+                const allStudents = await response.json();
+
+                const studentByEmail = allStudents.find(s => s.email === newEnrollment.email);
+
+                if (!studentByEmail) {
+                    showAlert("No student with this email found.", "error");
+                    return null;
+                }
+
+                const mismatchedFields = [];
+                if (studentByEmail.name !== newEnrollment.name) mismatchedFields.push("Name");
+                if (studentByEmail.city !== newEnrollment.city) mismatchedFields.push("City");
+
+                if (mismatchedFields.length > 0) {
+                    showAlert(
+                        "Student found by email, but following fields do not match: " + mismatchedFields.join(", "),
+                        "error"
+                    );
+                    return null;
+                }
+
+                return studentByEmail;
+
+            } catch (err) {
+                console.error("Error fetching students:", err);
+                showAlert("Failed to fetch students: " + err.message, "error");
+                return null;
+            }
+        }
+
+
+
+        async function save() {
+            const relevantStudent = await getStudent();
+            if (!relevantStudent) return;
+
+            const newEnrollment = { studentId: relevantStudent._id, courses: [] };
+
+            try {
+                const response = await fetch("http://127.0.0.1:8800/enrollments", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newEnrollment)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert("Enrollment added successfully!", "success");
+                    setTimeout(() => window.location.href = "allEnrolled.html", 2500);
+                } else {
+                    showAlert("Error: " + (data.msg || response.statusText), "error");
+                }
+
+            } catch (err) {
+                console.error("Error saving enrollment:", err);
+                showAlert("Request failed: " + err.message, "error");
+            }
+        }
+
+        function cancel() {
+            window.location.href = "allEnrolled.html";
+        }
+    </script>
+
+    <script src="auth.js"></script>
+</body>
+
+</html>
+
+

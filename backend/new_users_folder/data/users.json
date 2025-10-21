@@ -1,0 +1,23 @@
+[
+    {
+        "id": "687cccbcab4ab5d186e33b1c",
+        "firstName": "רבקי",
+        "lastName": "שוורץ",
+        "createdDate": "2024-06-01",
+        "sessionTimeOut": 222
+    },
+    {
+        "id": "6880d548ac7db06ca696c9b6",
+        "firstName": "יוני",
+        "lastName": "לוין",
+        "createdDate": "2024-06-01",
+        "sessionTimeOut": 400
+    },
+    {
+        "id": "68bde47453edd86167a629db",
+        "firstName": "מוישי",
+        "lastName": "שוורץ",
+        "createdDate": "2025-09-07",
+        "sessionTimeOut": 20
+    }
+]

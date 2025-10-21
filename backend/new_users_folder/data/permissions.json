@@ -1,0 +1,34 @@
+[
+    {
+        "id": "687cccbcab4ab5d186e33b1c",
+        "permissions": [
+            "View Enrollments",
+            "Create Enrollments",
+            "View Courses",
+            "admin",
+            "Update Courses",
+            "Update Enrollments",
+            "Delete Enrollments",
+            "Create Courses",
+            "Delete Courses"
+        ]
+    },
+    {
+        "id": "6880d548ac7db06ca696c9b6",
+        "permissions": [
+            "View Enrollments",
+            "View Courses",
+            "Create Enrollments",
+            "Create Courses"
+        ]
+    },
+    {
+        "id": "68bde47453edd86167a629db",
+        "permissions": [
+            "View Courses",
+            "Create Courses",
+            "Delete Courses",
+            "Update Courses"
+        ]
+    }
+]

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="form-card">
+    <h1>Create an Account</h1>
+
+    <label for="username">USERNAME:</label>
+    <input type="text" id="username" placeholder="Enter username" />
+    <br /><br />
+
+    <label for="password">PASSWORD:</label>
+    <input type="password" id="password" placeholder="Create password" />
+    <br />
+
+    <button onclick="handleCreateAccount()">CREATE</button>
+
+    <div id="message" style="color:red; margin-top:10px;"></div>
+  </div>
+
+  <script>
+    const getUsername = () => document.getElementById("username").value.trim();
+    const getPassword = () => document.getElementById("password").value.trim();
+
+
+    async function handleCreateAccount() {
+      const username = getUsername();
+      const password = getPassword();
+      const messageEl = document.getElementById("message");
+
+      messageEl.textContent = "";
+
+      if (!username || !password) {
+        messageEl.textContent = "Please enter both username and password.";
+        return;
+      }
+
+      try {
+        const resp = await fetch("http://127.0.0.1:8000/login/newUser", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await resp.json();
+        console.log("result:", data);
+
+        if (data.error) {
+          messageEl.textContent = data.error;
+          if (data.error == "The user is already registered in the system. Try logging in again with your password.") {
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 3000);
+
+          }
+        }
+
+
+        if (data.token) {
+          sessionStorage.setItem("username", username);
+          sessionStorage.setItem("token", data.token);
+          window.location.href = "main.html";
+        }
+
+      } catch (err) {
+        console.error("Error creating account:", err);
+        messageEl.textContent = "Something went wrong. Please try again.";
+      }
+    }
+
+
+  </script>
+  <script src="auth.js"></script>
+</body>
+
+</html>

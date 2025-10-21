@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>edit course</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+    <script src="navbarAndName.js"></script>
+
+    <script src="alerts.js"></script>
+
+    <h1>Edit Course</h1><br>
+    <div id="divContainer"></div>
+
+    <script>
+        const token = sessionStorage.getItem("token");
+        let course;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get("id");
+
+
+        const getCourse = async () => {
+            const resp = await fetch(`http://127.0.0.1:8800/courses/${courseId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+
+
+            if (!resp.ok) {
+                showAlert("Failed to load course data!", "error");
+                throw new Error("Failed to load course");
+            }
+
+            const course = await resp.json();
+            return course;
+        };
+
+
+        const editCourse = async () => {
+            try {
+                course = await getCourse();
+            } catch (error) {
+                console.error(error);
+                return;
+            }
+
+            const divContainer = document.getElementById("divContainer");
+            divContainer.innerHTML = `
+                <div class="form-card">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" value="${course.name}" onchange="handleChanges(this,'name')"> <br><br>
+
+                    <label for="category">Category:</label>
+                    <input type="text" id="category" value="${course.category}" onchange="handleChanges(this,'category')"> <br><br>
+
+                    <label for="image">Image URL:</label>
+                    <input type="url" id="image" value="${course.image}" onchange="handleChanges(this,'image')"><br><br>
+
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" value="${course.startDate}" onchange="handleChanges(this,'startDate')"> <br><br>
+
+                    <div class="button-group">
+                        <button onclick="update()">Update</button>
+                        <button onclick="cancel()">Cancel</button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const handleChanges = (element, key) => {
+            const newData = element.value;
+            course = { ...course, [key]: newData };
+        };
+
+
+        const update = async () => {
+            const resp = await fetch(`http://127.0.0.1:8800/courses/${courseId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(course)
+            });
+
+            if (!resp.ok) {
+                showAlert("Error updating course!", "error");
+                return;
+            }
+
+            const result = await resp.json();
+            showAlert("Course updated successfully!", "success");
+
+            setTimeout(() => {
+                window.location.href = "allCourses.html";
+            }, 2500);
+        };
+
+        const cancel = () => {
+            window.history.back();
+        };
+
+        editCourse();
+    </script>
+
+    <script src="auth.js"></script>
+</body>
+
+</html>
