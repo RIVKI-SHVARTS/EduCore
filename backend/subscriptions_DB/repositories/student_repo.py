@@ -1,10 +1,14 @@
 from pymongo import MongoClient
 from bson import ObjectId
+import os
+
 
 class student_db_repo:
     def __init__(self):
         # self.__client = MongoClient(port=27017)
-        self.__client = MongoClient("mongodb+srv://rs0583221748_db_user:OwOmhGZKzyRojOpd@coursemanagerdb.mjca2e1.mongodb.net/?appName=CourseManagerDB")
+        # self.__client = MongoClient("mongodb+srv://rs0583221748_db_user:OwOmhGZKzyRojOpd@coursemanagerdb.mjca2e1.mongodb.net/?appName=CourseManagerDB")
+        mongo_uri = os.getenv("MONGO_URI")  # קרא מה-Environment Variable
+        self.__client = MongoClient(mongo_uri)
         self.__db = self.__client["project_4_subscriptions"]
         self.__collection = self.__db["students"]
 
