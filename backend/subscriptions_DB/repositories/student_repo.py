@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from bson import ObjectId
-git add .
+
 class student_db_repo:
     def __init__(self):
         # self.__client = MongoClient(port=27017)
