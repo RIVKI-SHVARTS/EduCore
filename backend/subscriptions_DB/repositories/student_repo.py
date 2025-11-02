@@ -1,9 +1,10 @@
 from pymongo import MongoClient
 from bson import ObjectId
-
+git add .
 class student_db_repo:
     def __init__(self):
-        self.__client = MongoClient(port=27017)
+        # self.__client = MongoClient(port=27017)
+        self.__client = MongoClient("mongodb+srv://rs0583221748_db_user:OwOmhGZKzyRojOpd@coursemanagerdb.mjca2e1.mongodb.net/?appName=CourseManagerDB")
         self.__db = self.__client["project_4_subscriptions"]
         self.__collection = self.__db["students"]
 
