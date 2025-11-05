@@ -43,4 +43,6 @@ if students_inserter.is_db_empty():
 if courses_inserter.is_db_empty():
     courses_inserter.Insert_courses_into_the_db()
 
-app.run(port=8800,  debug=True)
+# app.run(port=8800,  debug=True)
+app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8800)), debug=True)
+
