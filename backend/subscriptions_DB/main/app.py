@@ -12,10 +12,18 @@ from services.init_db_service import courses_to_db, students_to_db
 # app = Flask(__name__)
 
 # CORS(app)
+# app = Flask(__name__)
+# CORS(app, supports_credentials=True,
+#      origins="http://127.0.0.1:5500",
+#      allow_headers=["Content-Type", "Authorization"])
+
 app = Flask(__name__)
-CORS(app, supports_credentials=True,
-     origins="http://127.0.0.1:5500",
-     allow_headers=["Content-Type", "Authorization"])
+CORS(app,
+     supports_credentials=True,
+     origins=["*"],
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -43,6 +51,6 @@ if students_inserter.is_db_empty():
 if courses_inserter.is_db_empty():
     courses_inserter.Insert_courses_into_the_db()
 
-# app.run(port=8800,  debug=True)
-app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8800)), debug=True)
+app.run(port=8800,  debug=True)
+# app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8800)), debug=True)
 
