@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    function coplot() {
+        const plotContainer = document.createElement('div');
+        plotContainer.id = 'coplot-container';
+        plotContainer.innerHTML = '<h2>Co-Plot Section</h2><p>This is where the co-plot will be displayed.</p>';
+        document.body.appendChild(plotContainer);
+    }
+                return;
+            }
+
+            container.innerHTML = "";
+
+            users.forEach(user => {
+                const userDiv = document.createElement("div");
+                userDiv.className = "user-card";
+                userDiv.innerHTML = `
+                    <h3>${user.name}</h3>
+                    <p>Email: ${user.email}</p>
+                    <p>Role: ${user.role}</p>
+                `;
+                container.appendChild(userDiv);
+            });
+        }
+
+        renderUsers();
+
+    </script>   
+
+</body>
+</html>
