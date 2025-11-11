@@ -32,7 +32,9 @@
 
         async function getAllUsers() {
             try {
-                const resp = await fetch("http://127.0.0.1:8000/users", {
+                // const resp = await fetch("http://127.0.0.1:8000/users", {
+                    const resp = await fetch("https://educore-m9yh.onrender.com/users", {
+
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -96,7 +98,9 @@
                 0,
                 async () => {
                     try {
-                        const resp = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+                        // const resp = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+                            const resp = await fetch(`https://educore-m9yh.onrender.com/users/${id}`, {
+
                             method: "DELETE",
                             headers: {
                                 "Content-Type": "application/json",

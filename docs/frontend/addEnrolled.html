@@ -64,7 +64,9 @@
             if (!newEnrollment) return null;
 
             try {
-                const response = await fetch("http://127.0.0.1:8800/students", {
+                // const response = await fetch("http://127.0.0.1:8800/students", {
+                    const response = await fetch("https://educore-subscriptions-db.onrender.com/students", {
+
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -113,7 +115,9 @@
             const newEnrollment = { studentId: relevantStudent._id, courses: [] };
 
             try {
-                const response = await fetch("http://127.0.0.1:8800/enrollments", {
+                // const response = await fetch("http://127.0.0.1:8800/enrollments", {
+                    const response = await fetch("https://educore-subscriptions-db.onrender.com/enrollments", {
+
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

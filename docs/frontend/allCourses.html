@@ -72,7 +72,9 @@
       
         async function getAllCourses() {
             try {
-                const resp = await fetch("http://127.0.0.1:8800/courses/", {
+                // const resp = await fetch("http://127.0.0.1:8800/courses/", {
+                    const resp = await fetch("https://educore-subscriptions-db.onrender.com/courses/", {
+
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -88,7 +90,9 @@
 
         async function getAllEnrollments() {
             try {
-                const resp = await fetch("http://127.0.0.1:8800/enrollments", {
+                // const resp = await fetch("http://127.0.0.1:8800/enrollments", {
+                    const resp = await fetch("https://educore-subscriptions-db.onrender.com/enrollments", {
+
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -104,7 +108,9 @@
 
         async function getAllMembers() {
             try {
-                const resp = await fetch("http://127.0.0.1:8800/students", {
+                // const resp = await fetch("http://127.0.0.1:8800/students", {
+                    const resp = await fetch("https://educore-subscriptions-db.onrender.com/students", {
+
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

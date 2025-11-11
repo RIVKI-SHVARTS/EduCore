@@ -28,7 +28,9 @@
 
     const getStudent = async () => {
       try {
-        const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+        // const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+          const resp = await fetch(`https://educore-subscriptions-db.onrender.com/students/${studentId}`, {
+
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -90,7 +92,9 @@
 
     const updateStudent = async () => {
       try {
-        const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+        // const resp = await fetch(`http://127.0.0.1:8800/students/${studentId}`, {
+          const resp = await fetch(`https://educore-subscriptions-db.onrender.com/students/${studentId}`, {
+
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

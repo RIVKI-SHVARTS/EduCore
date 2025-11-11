@@ -29,7 +29,9 @@
 
     const gtUserData = async () => {
       try {
-        const resp = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+        // const resp = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+          const resp = await fetch(`https://educore-m9yh.onrender.com/users/${userId}`, {
+
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -178,7 +180,9 @@
 
     const update = async (id) => {
       
-      const resp = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+      // const resp = await fetch(`http://127.0.0.1:8000/users/${id}`, {
+        const resp = await fetch(`https://educore-m9yh.onrender.com/users/${id}`, {
+
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

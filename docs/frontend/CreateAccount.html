@@ -44,7 +44,9 @@
       }
 
       try {
-        const resp = await fetch("http://127.0.0.1:8000/login/newUser", {
+        // const resp = await fetch("http://127.0.0.1:8000/login/newUser", {
+          const resp = await fetch("https://educore-m9yh.onrender.com/login/newUser", {
+
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
