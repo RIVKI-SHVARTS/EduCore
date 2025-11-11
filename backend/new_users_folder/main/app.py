@@ -11,11 +11,18 @@ app = Flask(__name__)
 #      origins="http://127.0.0.1:5500",
 #      allow_headers=["Content-Type", "Authorization"])
 
+# CORS(app,
+#      supports_credentials=True,
+#      origins=["*"],
+#      allow_headers=["Content-Type", "Authorization"],
+#      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
 CORS(app,
      supports_credentials=True,
-     origins=["*"],
+     origins=["https://educore-frontend-x84p.onrender.com"],
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
 
 class CustomJSONProvider(DefaultJSONProvider):
     def default(self, obj):
