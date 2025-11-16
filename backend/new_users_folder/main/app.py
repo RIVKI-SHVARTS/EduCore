@@ -31,11 +31,6 @@ class CustomJSONProvider(DefaultJSONProvider):
         return super().default(obj)
 
 app.json = CustomJSONProvider(app)
-from controllers.users_json_controller import users_json
-app.register_blueprint(users_json, url_prefix="/users_json")
-
-from controllers.permissions_json_controller import permissions_json
-app.register_blueprint(permissions_json, url_prefix="/permissions_json")
 
 from controllers.users_controllers import users
 app.register_blueprint(users, url_prefix="/users")
