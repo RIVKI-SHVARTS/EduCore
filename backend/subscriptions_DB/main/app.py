@@ -13,9 +13,19 @@ from services.init_db_service import courses_to_db, students_to_db
 # CORS(app)
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True,
-     origins="http://127.0.0.1:5500",
-     allow_headers=["Content-Type", "Authorization"])
+# CORS(app, supports_credentials=True,
+#      origins="http://127.0.0.1:5500",
+#      allow_headers=["Content-Type", "Authorization"])
+
+CORS(app,
+     supports_credentials=True,
+     origins=[
+         "https://educore-frontend-x84p.onrender.com",
+         "http://localhost:5500"
+     ],
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+
 
 
 
