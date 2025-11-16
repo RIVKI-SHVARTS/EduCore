@@ -1,12 +1,17 @@
 import json
 import os
 
-
-BASE_DIR = os.path.dirname(__file__)
+import pathlib
+# שיניתי פה את הנטב כי הrender לא הצליח למצוא אותו נכון
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent  
+DATA_DIR = BASE_DIR / "data"
+# BASE_DIR = os.path.dirname(__file__)
 
 class Users_repo:
     def __init__(self):
-        self.path = os.path.abspath(os.path.join(BASE_DIR, "../data/users.json"))   
+        self.path = DATA_DIR / "permissions.json"
+
+        # self.path = os.path.abspath(os.path.join(BASE_DIR, "../data/users.json"))   
 
     def load_all_users(self):
         if not os.path.exists(self.path):
