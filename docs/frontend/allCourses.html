@@ -54,7 +54,6 @@
         let allCoursesCache = [];
         let allEnrollmentsCache = [];
         let allMembersCache = [];
-        let allUsersFromJson = []
 
         async function loadUsers() {
             try {
@@ -253,7 +252,6 @@
             allCoursesCache = await getAllCourses();
             allEnrollmentsCache = await getAllEnrollments();
             allMembersCache = await getAllMembers();
-            allUsersFromJson = await loadUsers();
         };
 
         const find = () => {
