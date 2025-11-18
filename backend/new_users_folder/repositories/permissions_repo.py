@@ -11,7 +11,7 @@ DATA_DIR = BASE_DIR / "data"
 
 class Permissions_repo:
     def __init__(self):
-        self.path = DATA_DIR / "users.json"
+        self.path = DATA_DIR / "permissions.json"
 
         # self.path = os.path.abspath(os.path.join(BASE_DIR, "../data/permissions.json"))
 
