@@ -148,7 +148,7 @@
 
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
-            // newUser = { ...newUser, ["createdDate"]: formattedDate }
+            newUser = { ...newUser, ["createdDate"]: formattedDate }
 
             // const resp = await fetch(`http://127.0.0.1:8000/users`, {
                 const resp = await fetch(`https://educore-m9yh.onrender.com/users`, {
