@@ -177,6 +177,10 @@
     }
 
     async function registerBut(courseId, studentId, startDate, registrationDate) {
+      console.log(allEnrollments);
+      console.log(allStudents);
+      console.log(allCourses);
+      console.log(aggregated);
       const enrollment = allEnrollments.find(e => String(e.studentId) === String(studentId));
       if (!enrollment) return alert("Enrollment not found for this student.");
 
