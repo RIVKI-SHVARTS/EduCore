@@ -41,10 +41,10 @@
                         "Authorization": `Bearer ${token}`
                     }
                 });
-
                 if (!resp.ok) throw new Error(resp.status);
 
                 return await resp.json();
+
             } catch (err) {
                 console.error("Fetch failed:", err);
                 showAlert("Unable to fetch users", "error");
@@ -56,6 +56,8 @@
 
         async function renderUsers() {
             const users = await getAllUsers();
+            console.log(users);
+
             if (!users || !Array.isArray(users)) {
                 container.innerHTML = "<p>No users to display</p>";
                 return;
