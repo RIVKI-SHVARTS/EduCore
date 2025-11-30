@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 CORS(app,
      supports_credentials=True,
-     origins=["https://educore-frontend-x84p.onrender.com"],
+     origins=["https://educore-frontend-x84p.onrender.com","https://rivki-shvarts.github.io"],
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
