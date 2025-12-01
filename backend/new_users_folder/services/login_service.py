@@ -60,7 +60,7 @@ class login_service:
         user = next((u for u in allUsers if str(u["id"]) == str(user_id)), None)
         payload = {
             "user_id": str(user_id),
-            "exp": datetime.utcnow() + timedelta(minutes = user["sessionTimeOut"])
+            "exp": datetime.utcnow() + timedelta(minutes = int(user["sessionTimeOut"]))
     
 
         }

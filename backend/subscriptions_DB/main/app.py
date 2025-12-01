@@ -20,6 +20,7 @@ app = Flask(__name__)
 CORS(app,
      supports_credentials=True,
      origins=[
+        "https://rivki-shvarts.github.io",
          "https://educore-frontend-x84p.onrender.com",
          "http://localhost:5500"
      ],
