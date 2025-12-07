@@ -14,7 +14,7 @@
         ]
     },
     {
-        "id": "6880d548ac7db06ca696c9b6",
+        "id": "69355c033582c090ec3b86b6",
         "permissions": [
             "View Enrollments",
             "View Courses",
@@ -22,13 +22,5 @@
             "Create Courses"
         ]
     },
-    {
-        "id": "68bde47453edd86167a629db",
-        "permissions": [
-            "View Courses",
-            "Create Courses",
-            "Delete Courses",
-            "Update Courses"
-        ]
-    }
+
 ]
