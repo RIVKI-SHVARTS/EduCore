@@ -22,7 +22,8 @@ CORS(app,
      origins=[
         "https://rivki-shvarts.github.io",
          "https://educore-frontend-x84p.onrender.com",
-         "http://localhost:5500"
+         "http://localhost:5500",
+         "https://educore-frontend.netlify.app"
      ],
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
