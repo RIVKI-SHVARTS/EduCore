@@ -6,7 +6,7 @@ The system manages users, courses, students and enrollments, with secure authent
 
 Live System URLs:
 Frontend (Client): 
-https://educore-frontend-x84p.onrender.com/
+https://educore-frontend.netlify.app/
 
 Users Server (Authentication & User Management): 
 https://educore-m9yh.onrender.com/
