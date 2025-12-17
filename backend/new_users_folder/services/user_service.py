@@ -136,11 +136,18 @@ class Users_from_db:
         data_for_db = {"username": user["username"]}
 
         existing =  self.db_repo.get_username_by_id(id)
-        if not existing:
+        ADMIN_ID = "687cccbcab4ab5d186e33b1c"
+        if id == ADMIN_ID:
+            return{
+                "status": "error",
+                "message": "You do not have permission to change the admin"
+            }
+        elif  not existing:
             return {
                 "status": "error",
                 "message": "id is not exists"
             }
+    
 
         self.db_repo.update_username(id, data_for_db)
 
