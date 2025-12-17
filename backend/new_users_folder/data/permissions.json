@@ -17,9 +17,14 @@
         "id": "69355c033582c090ec3b86b6",
         "permissions": [
             "View Enrollments",
-            "View Courses",
             "Create Enrollments",
-            "Create Courses"
+            "View Courses",
+            "admin",
+            "Update Courses",
+            "Update Enrollments",
+            "Delete Enrollments",
+            "Create Courses",
+            "Delete Courses"
         ]
     }
 
